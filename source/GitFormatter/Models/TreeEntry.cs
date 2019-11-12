@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GitFormatter.Models
 {
-  public readonly struct TreeEntry
+  public class TreeEntry
   {
     public string Path { get; }
     public GitFileMode Mode { get; }
@@ -16,5 +16,7 @@ namespace GitFormatter.Models
       Mode = mode;
       Hash = hash;
     }
+
+    public override string ToString() => $"{(int)Mode} {Path} {Hash}";
   }
 }

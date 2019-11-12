@@ -1,13 +1,13 @@
-﻿using System;
+﻿using GitFormatter.Models;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using GitFormatter.Models;
+using System.Text;
 
 namespace GitFormatter.Formatters
 {
-  public interface IGitObjectFormatter
+  public interface IGitObjectFormatter<T> where T : GitObject
   {
-    Hash Write(Blob blob, out ReadOnlySpan<byte> content);
-    Hash Write(Commit commit, out ReadOnlySpan<byte> content);
-    Hash Write(Tree tree, out ReadOnlySpan<byte> content);
+    ReadOnlySpan<byte> Write(T item);
   }
 }

@@ -9,7 +9,7 @@ using System.Text;
 
 namespace GitFormatter.Formatters
 {
-  public sealed class TreeFormatter : IObjectFormatter<Tree>
+  public sealed class TreeFormatter : IGitObjectFormatter<Tree>
   {
     public ReadOnlySpan<byte> Write(Tree tree)
     {

@@ -14,6 +14,11 @@ namespace GitFormatter.Models
 
     public byte[] Content { get; }
 
+    public override string ToString()
+    {
+      return Encoding.Default.GetString(Content);
+    }
+
     public static Blob FromString(string s)
     {
       return new Blob(Encoding.Default.GetBytes(s));

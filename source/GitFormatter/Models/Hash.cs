@@ -9,8 +9,11 @@ namespace GitFormatter.Models
   public readonly struct Hash : IEquatable<Hash>
   {
     public byte[] Bytes { get; }
+    public bool IsEmpty => Bytes == null;
+
 
     public const int HashLength = 20;
+
 
     public Hash(byte[] bytes)
     {
@@ -56,9 +59,38 @@ namespace GitFormatter.Models
 
     public override bool Equals(object obj) => obj is Hash hash && Equals(hash);
 
-    public bool Equals(Hash other) => Enumerable.SequenceEqual(Bytes, other.Bytes);
+    public bool Equals(Hash other)
+    {
+      if (IsEmpty && other.IsEmpty)
+      {
+        return true;
+      }
 
-    public override int GetHashCode() => ToString().GetHashCode();
+      if (IsEmpty || other.IsEmpty)
+      {
+        return false;
+      }
+
+      for (var i = 0; i < HashLength; i++)
+      {
+        if (Bytes[i] != other.Bytes[i])
+        {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    public override int GetHashCode()
+    {
+      var hashCode = new HashCode();
+      foreach (var b in Bytes)
+      {
+        hashCode.Add(b);
+      }
+      return hashCode.ToHashCode();
+    }
 
     public static bool operator ==(Hash left, Hash right) => left.Equals(right);
 

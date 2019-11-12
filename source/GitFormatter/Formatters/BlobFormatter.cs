@@ -6,7 +6,7 @@ using System.Text;
 
 namespace GitFormatter.Formatters
 {
-  public sealed class BlobFormatter : IObjectFormatter<Blob>
+  public sealed class BlobFormatter : IGitObjectFormatter<Blob>
   {
     public ReadOnlySpan<byte> Write(Blob blob)
     {

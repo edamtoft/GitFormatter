@@ -20,5 +20,7 @@ namespace GitFormatter.Models
     public Signature Author { get; }
     public Signature Committer { get; }
     public string Message { get; }
+
+    public override string ToString() => Message;
   }
 }

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace GitFormatter.Formatters
 {
-  public sealed class CommitFormatter : IObjectFormatter<Commit>
+  public sealed class CommitFormatter : IGitObjectFormatter<Commit>
   {
     public ReadOnlySpan<byte> Write(Commit commit)
     {

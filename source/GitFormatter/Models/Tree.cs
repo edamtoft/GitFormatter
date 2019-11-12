@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using GitFormatter.Utils;
 
 namespace GitFormatter.Models
 {
@@ -20,6 +21,10 @@ namespace GitFormatter.Models
 
     public bool Remove(string path) => _items.RemoveWhere(item => item.Path == path) > 0;
 
+    public TreeEntry this[string path] => _items.FirstOrDefault(item => item.Path == path);
+
+    public bool Contains(string path) => _items.Any(item => item.Path == path);
+
     public IEnumerator<TreeEntry> GetEnumerator() => _items.OrderBy(item => item.Path).GetEnumerator();
 
     public void Clear() => _items.Clear();
@@ -29,5 +34,7 @@ namespace GitFormatter.Models
     void ICollection<TreeEntry>.CopyTo(TreeEntry[] array, int arrayIndex) => _items.CopyTo(array, arrayIndex);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public override string ToString() => string.Join(',', _items);
   }
 }
