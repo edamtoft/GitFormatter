@@ -12,37 +12,37 @@ namespace GitFormatter.Formatters
   {
     public ReadOnlySpan<byte> Write(Commit commit)
     {
-      var result = new StringBuilder();
+      var textFormat = new StringBuilder();
 
-      result
+      textFormat
           .AppendFormat("tree ")
-          .Append(commit.Tree.ToString())
+          .AppendHash(commit.Tree)
           .AppendUnixLineEnding();
 
       foreach (var parent in commit.Parents)
       {
-        result
+        textFormat
           .AppendFormat("parent ")
-          .Append(parent.ToString())
+          .AppendHash(parent)
           .AppendUnixLineEnding();
       }
 
-      result
+      textFormat
         .Append("author ")
         .AppendSignature(commit.Author)
         .AppendUnixLineEnding();
 
-      result
+      textFormat
         .Append("committer ")
         .AppendSignature(commit.Committer)
         .AppendUnixLineEnding();
 
-      result
+      textFormat
         .AppendUnixLineEnding()
         .Append(commit.Message)
         .AppendUnixLineEnding();
 
-      return Encoding.ASCII.GetBytes(result.ToString());
+      return Encoding.ASCII.GetBytes(textFormat.ToString());
     }
   }
 }

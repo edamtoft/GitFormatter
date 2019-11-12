@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using GitFormatter.Utils;
 
 namespace GitFormatter.Models
 {
@@ -28,12 +29,7 @@ namespace GitFormatter.Models
 
     public override string ToString()
     {
-      var result = new StringBuilder(Bytes.Length * 2);
-      foreach (var b in Bytes)
-      {
-        result.Append(b.ToString("x2"));
-      }
-      return result.ToString();
+      return new StringBuilder(Bytes.Length * 2).AppendHash(this).ToString();
     }
 
     public static Hash FromHex(string hexString)
