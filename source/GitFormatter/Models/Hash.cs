@@ -1,39 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using GitFormatter.Utils;
 
 namespace GitFormatter.Models
 {
-  public readonly struct Hash : IEquatable<Hash>
+  public readonly struct Hash : IEquatable<Hash>, IFormattable
   {
-    public byte[] Bytes { get; }
-    public bool IsEmpty => Bytes == null;
+    private readonly ReadOnlyMemory<byte> _bytes { get; }
 
+    private const int HashLength = 20;
 
-    public const int HashLength = 20;
-
-
-    public Hash(byte[] bytes)
+    public Hash(ReadOnlyMemory<byte> bytes)
     {
-      if (bytes == null)
-      {
-        throw new ArgumentNullException(nameof(bytes));
-      }
-
       if (bytes.Length != HashLength)
       {
         throw new ArgumentException("Incorrect hash size");
       }
 
-      Bytes = bytes;
+      _bytes = bytes;
     }
 
-    public override string ToString()
+    public ReadOnlySpan<byte> Span => _bytes.Span;
+
+    public string ToHex() => ToString("x2", CultureInfo.InvariantCulture);
+
+    public string ToString(string format, IFormatProvider formatProvider)
     {
-      return new StringBuilder(Bytes.Length * 2).AppendHash(this).ToString();
+      var hex = new StringBuilder(_bytes.Length * 2);
+      foreach (var b in _bytes.Span)
+      {
+        hex.Append(b.ToString(format, formatProvider));
+      }
+      return hex.ToString();
     }
+
+    public override string ToString() => ToHex();
 
     public static Hash FromHex(string hexString)
     {
@@ -47,11 +51,14 @@ namespace GitFormatter.Models
         throw new FormatException("Hex string length must be divisible by 2");
       }
 
+      var span = hexString.AsSpan();
+
       var bytes = new byte[HashLength];
 
       for (var i = 0; i < bytes.Length; i++)
       {
-        bytes[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
+        var substring = new string(span.Slice(i * 2, 2));
+        bytes[i] = Convert.ToByte(substring, 16);
       }
 
       return new Hash(bytes);  
@@ -59,33 +66,12 @@ namespace GitFormatter.Models
 
     public override bool Equals(object obj) => obj is Hash hash && Equals(hash);
 
-    public bool Equals(Hash other)
-    {
-      if (IsEmpty && other.IsEmpty)
-      {
-        return true;
-      }
-
-      if (IsEmpty || other.IsEmpty)
-      {
-        return false;
-      }
-
-      for (var i = 0; i < HashLength; i++)
-      {
-        if (Bytes[i] != other.Bytes[i])
-        {
-          return false;
-        }
-      }
-
-      return true;
-    }
+    public bool Equals(Hash other) => _bytes.Span.SequenceEqual(other._bytes.Span);
 
     public override int GetHashCode()
     {
       var hashCode = new HashCode();
-      foreach (var b in Bytes)
+      foreach (var b in _bytes.Span)
       {
         hashCode.Add(b);
       }
@@ -93,7 +79,6 @@ namespace GitFormatter.Models
     }
 
     public static bool operator ==(Hash left, Hash right) => left.Equals(right);
-
     public static bool operator !=(Hash left, Hash right) => !(left == right);
   }
 }

@@ -8,8 +8,8 @@ namespace GitFormatter
 {
   public interface IObjectDb
   {
-    Task<Hash> HashObject(GitObject obj);
+    Task<Hash> Put(GitObject obj);
 
-    Task<GitObject> Get(Hash hash);
+    Task<TGitObject> Get<TGitObject>(Hash hash) where TGitObject : GitObject;
   }
 }

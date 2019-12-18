@@ -1,25 +1,20 @@
 using GitFormatter;
-using GitFormatter.Formatters;
 using GitFormatter.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 
 namespace GitFormatterTests.Formatting
 {
   [TestClass]
   public class HashTests
   {
-    public static GitHashWriter Writer { get; } = new GitHashWriter(
-      new CommitFormatter(), 
-      new TreeFormatter(), 
-      new BlobFormatter());
-
     [TestMethod]
     public void ComputeEmptyTreeHash()
     {
-      var tree = new Tree();
+      var tree = Tree.Empty;
 
-      var hash = Writer.Write(tree, out _);
+      var hash = tree.GetGitHash();
 
       Assert.AreEqual("4b825dc642cb6eb9a060e54bf8d69288fbee4904", hash.ToString());
     }
@@ -39,7 +34,7 @@ namespace GitFormatterTests.Formatting
         signature,
         "initial commit");
 
-      var hash = Writer.Write(commit, out _);
+      var hash = commit.GetGitHash();
 
       Assert.AreEqual("08e57b124c3fb7347b5cb7f31b44053eee414f1d", hash.ToString());
     }
@@ -49,7 +44,7 @@ namespace GitFormatterTests.Formatting
     [DataRow("hello world 2", "93ab6b3948bee6940715c24b46ceb5f48c715be7")]
     public void ComputeTextBlobHash(string text, string expectedHash)
     {
-      var hash = Writer.Write(Blob.FromString(text), out _);
+      var hash = Blob.FromString(text).GetGitHash();
 
       Assert.AreEqual(expectedHash, hash.ToString());
     }
@@ -57,12 +52,12 @@ namespace GitFormatterTests.Formatting
     [TestMethod]
     public void TreeWithSingleEntry()
     {
-      var tree = new Tree
+      var tree = new Tree(new Dictionary<string, TreeEntry>
       {
-        new TreeEntry("sample.txt", GitFileMode.File, Hash.FromHex("95d09f2b10159347eece71399a7e2e907ea3df4f"))
-      };
+        ["sample.txt"] = new TreeEntry(GitFileMode.File, Hash.FromHex("95d09f2b10159347eece71399a7e2e907ea3df4f"))
+      });
 
-      var hash = Writer.Write(tree, out _);
+      var hash = tree.GetGitHash();
 
       Assert.AreEqual("e977ed57f8becb373fa5dc9af3e5d7dba39fcacd", hash.ToString());
     }
@@ -70,13 +65,13 @@ namespace GitFormatterTests.Formatting
     [TestMethod]
     public void TreeWithMultipleEntries()
     {
-      var tree = new Tree
+      var tree = new Tree(new Dictionary<string, TreeEntry>
       {
-        new TreeEntry("sample.txt", GitFileMode.File, Hash.FromHex("95d09f2b10159347eece71399a7e2e907ea3df4f")),
-        new TreeEntry("sample2.txt", GitFileMode.File, Hash.FromHex("93ab6b3948bee6940715c24b46ceb5f48c715be7")),
-      };
+        ["sample.txt"] = new TreeEntry(GitFileMode.File, Hash.FromHex("95d09f2b10159347eece71399a7e2e907ea3df4f")),
+        ["sample2.txt"] = new TreeEntry(GitFileMode.File, Hash.FromHex("93ab6b3948bee6940715c24b46ceb5f48c715be7"))
+      });
 
-      var hash = Writer.Write(tree, out _);
+      var hash = tree.GetGitHash();
 
       Assert.AreEqual("d04b476e5c85567cc72603fa0386d89b89dfe8ba", hash.ToString());
     }
@@ -101,7 +96,7 @@ namespace GitFormatterTests.Formatting
         committer,
         "Add Sample Files");
 
-      var hash = Writer.Write(commit, out _);
+      var hash = commit.GetGitHash();
 
       Assert.AreEqual("78b4e971f5602d603a4e235944fff4d9585d9894", hash.ToString());
     }

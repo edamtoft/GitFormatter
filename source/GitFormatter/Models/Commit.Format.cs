@@ -1,25 +1,23 @@
-﻿using GitFormatter.Models;
-using GitFormatter.Utils;
+﻿using GitFormatter.Utils;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Collections.Immutable;
 using System.Text;
 
-namespace GitFormatter.Formatters
+namespace GitFormatter.Models
 {
-  public sealed class CommitFormatter : IGitObjectFormatter<Commit>
+  partial class Commit
   {
-    public ReadOnlySpan<byte> Write(Commit commit)
+    public override ReadOnlySpan<byte> GetGitFormat()
     {
       var textFormat = new StringBuilder();
 
       textFormat
           .AppendFormat("tree ")
-          .AppendHash(commit.Tree)
+          .AppendHash(Tree)
           .AppendUnixLineEnding();
 
-      foreach (var parent in commit.Parents)
+      foreach (var parent in Parents)
       {
         textFormat
           .AppendFormat("parent ")
@@ -29,20 +27,24 @@ namespace GitFormatter.Formatters
 
       textFormat
         .Append("author ")
-        .AppendSignature(commit.Author)
+        .AppendSignature(Author)
         .AppendUnixLineEnding();
 
       textFormat
         .Append("committer ")
-        .AppendSignature(commit.Committer)
+        .AppendSignature(Committer)
         .AppendUnixLineEnding();
 
       textFormat
         .AppendUnixLineEnding()
-        .Append(commit.Message)
+        .Append(Message)
         .AppendUnixLineEnding();
 
-      return Encoding.ASCII.GetBytes(textFormat.ToString());
+      var content = Encoding.ASCII.GetBytes(textFormat.ToString());
+
+      return ReadOnlySpan<byte>.Empty
+        .AppendText($"commit {content.Length}\u0000", Encoding.ASCII)
+        .Append(content);
     }
   }
 }

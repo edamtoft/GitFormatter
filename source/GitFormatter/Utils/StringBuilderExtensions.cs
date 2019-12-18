@@ -26,11 +26,7 @@ namespace GitFormatter.Utils
 
     internal static StringBuilder AppendHash(this StringBuilder builder, Hash hash)
     {
-      foreach (var b in hash.Bytes)
-      {
-        builder.AppendFormat(b.ToString("x2"));
-      }
-      return builder;
+      return builder.Append(hash.ToHex());
     }
   }
 }

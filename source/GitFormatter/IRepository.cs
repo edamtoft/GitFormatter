@@ -5,7 +5,9 @@ namespace GitFormatter
 {
   public interface IRepository
   {
-    IObjectDb ObjectDb { get; }
     IReferenceDb ReferenceDb { get; }
+    IObjectDb ObjectDb { get; }
+
+    Task<bool> Commit(string reference, Commit commit, bool force);
   }
 }

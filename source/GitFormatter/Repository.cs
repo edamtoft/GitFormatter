@@ -17,5 +17,19 @@ namespace GitFormatter
 
     public IReferenceDb ReferenceDb { get; }
     public IObjectDb ObjectDb { get; }
+
+    public async Task<bool> Commit(string reference, Commit commit, bool force)
+    {
+      var existingHash = await ReferenceDb.Get(reference);
+
+      if (!force && existingHash.HasValue && commit.Parents.Contains(existingHash.Value))
+      {
+        return false;
+      }
+
+      var commitHash = await ObjectDb.Put(commit);
+
+      return await ReferenceDb.Put(reference, commitHash, existingHash);
+    }
   }
 }
