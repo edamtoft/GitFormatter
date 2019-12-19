@@ -19,13 +19,11 @@ namespace GitFormatter.ObjectGraph
 
     private IRepository Repository { get; }
 
-    public async Task<Hash> Set<TNode>(Hash commit, Expression<Func<TRoot, TNode>> expression, TNode node)
+    public async Task<Hash> Set<TNode>(Hash tree, Expression<Func<TRoot, TNode>> expression, TNode node)
     {
-      var parentCommit = await Repository.ObjectDb.Get<Commit>(commit);
-
       var path = ImmutableArray.CreateRange(ExpressionToPath(expression.Body));
 
-      var root = await Visit(parentCommit.Tree, path, node);
+      var root = await Visit(tree, path, node);
 
       return root.Hash;
     }
