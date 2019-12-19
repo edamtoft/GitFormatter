@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\source\GitFormatter.ObjectGraph\GitFormatter.ObjectGraph.csproj" />
     <ProjectReference Include="..\..\source\GitFormatter\GitFormatter.csproj" />
   </ItemGroup>
 

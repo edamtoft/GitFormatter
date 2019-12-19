@@ -1,18 +1,24 @@
-﻿using System;
+﻿using GitFormatter.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace GitFormatter.Models
 {
-  public sealed class Blob : GitObject
+  public sealed partial class Blob : GitObject
   {
-    public Blob(byte[] content)
+    public Blob(ReadOnlyMemory<byte> content)
     {
-      Content = content ?? throw new ArgumentNullException(nameof(content));
+      Content = content;
     }
 
-    public byte[] Content { get; }
+    public ReadOnlyMemory<byte> Content { get; }
+
+    public override string ToString()
+    {
+      return Encoding.Default.GetString(Content.Span);
+    }
 
     public static Blob FromString(string s)
     {
