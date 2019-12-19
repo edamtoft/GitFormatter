@@ -12,12 +12,12 @@ namespace GitFormatter.Models
   {
     public Tree(IEnumerable<KeyValuePair<string, TreeEntry>> items)
     {
-      _items = items.ToImmutableSortedDictionary(StringComparer.Ordinal);
+      _items = items.ToImmutableSortedDictionary();
     }
 
     public Tree()
     {
-      _items = ImmutableSortedDictionary.Create<string, TreeEntry>(StringComparer.Ordinal);
+      _items = ImmutableSortedDictionary<string,TreeEntry>.Empty;
     }
 
     private readonly ImmutableSortedDictionary<string, TreeEntry> _items;

@@ -7,7 +7,7 @@ using GitFormatter.Utils;
 
 namespace GitFormatter.Models
 {
-  public readonly struct Hash : IEquatable<Hash>, IFormattable
+  public readonly struct Hash : IEquatable<Hash>
   {
     private readonly ReadOnlyMemory<byte> _bytes { get; }
 
@@ -25,17 +25,20 @@ namespace GitFormatter.Models
 
     public ReadOnlySpan<byte> Span => _bytes.Span;
 
-    public string ToHex() => ToString("x2", CultureInfo.InvariantCulture);
-
-    public string ToString(string format, IFormatProvider formatProvider)
+    public string ToHex() => string.Create(_bytes.Length * 2, _bytes, (chars, bytes) =>
     {
-      var hex = new StringBuilder(_bytes.Length * 2);
-      foreach (var b in _bytes.Span)
+      const string alphabet = "0123456789abcdef";
+      var charIndex = 0;
+      var bufferIndex = 0;
+      while (charIndex < chars.Length)
       {
-        hex.Append(b.ToString(format, formatProvider));
+        var b = bytes.Span[bufferIndex];
+        chars[charIndex] = alphabet[b / 16];
+        chars[charIndex + 1] = alphabet[b % 16];
+        bufferIndex++;
+        charIndex += 2;
       }
-      return hex.ToString();
-    }
+    });
 
     public override string ToString() => ToHex();
 
@@ -51,13 +54,13 @@ namespace GitFormatter.Models
         throw new FormatException("Hex string length must be divisible by 2");
       }
 
-      var span = hexString.AsSpan();
+      var hexStringSpan = hexString.AsSpan();
 
       var bytes = new byte[HashLength];
 
       for (var i = 0; i < bytes.Length; i++)
       {
-        var substring = new string(span.Slice(i * 2, 2));
+        var substring = new string(hexStringSpan.Slice(i * 2, 2));
         bytes[i] = Convert.ToByte(substring, 16);
       }
 
@@ -80,5 +83,8 @@ namespace GitFormatter.Models
 
     public static bool operator ==(Hash left, Hash right) => left.Equals(right);
     public static bool operator !=(Hash left, Hash right) => !(left == right);
+
+    public static implicit operator string(Hash hash) => hash.ToHex();
+    public static explicit operator Hash(string hexString) => Hash.FromHex(hexString);
   }
 }
